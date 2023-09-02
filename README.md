@@ -55,19 +55,19 @@ python verify_api_key.py your_actual_api_key_here
 ```
 If the program consistently reports that the API key is invalid, there could be several reasons for this:
 
-    Incorrect API Key: Make sure you are providing the correct OpenAI API key. The API key should be a long string of letters and numbers, and it should be copied and pasted accurately into the command line.
+- Incorrect API Key: Make sure you are providing the correct OpenAI API key. The API key should be a long string of letters and numbers, and it should be copied and pasted accurately into the command line.
 
-    Expired or Revoked Key: If the API key has expired or has been revoked by OpenAI, it will be considered invalid. Check the status of your API key in your OpenAI account dashboard.
+- Expired or Revoked Key: If the API key has expired or has been revoked by OpenAI, it will be considered invalid. Check the status of your API key in your OpenAI account dashboard.
 
-    Network Issues: Ensure that your computer has a working internet connection. The script needs to make a network request to OpenAI's servers to validate the API key.
+- Network Issues: Ensure that your computer has a working internet connection. The script needs to make a network request to OpenAI's servers to validate the API key.
 
-    Firewall or Proxy Issues: If you're behind a corporate firewall or using a proxy server, it may be blocking the script's requests. Make sure that the necessary network configurations are in place.
+- Firewall or Proxy Issues: If you're behind a corporate firewall or using a proxy server, it may be blocking the script's requests. Make sure that the necessary network configurations are in place.
 
-    Rate Limits: OpenAI imposes rate limits on API requests. If you have exceeded the rate limits, it may temporarily block your requests, leading to an "invalid" response. Check OpenAI's documentation for rate limit details and ensure you're not exceeding them.
+- Rate Limits: OpenAI imposes rate limits on API requests. If you have exceeded the rate limits, it may temporarily block your requests, leading to an "invalid" response. Check OpenAI's documentation for rate limit details and ensure you're not exceeding them.
 
-    OpenAI Service Status: Sometimes, OpenAI services can experience downtime or issues. Check OpenAI's status page or their official communication channels for any service disruptions.
+- OpenAI Service Status: Sometimes, OpenAI services can experience downtime or issues. Check OpenAI's status page or their official communication channels for any service disruptions.
 
-    Script Issues: Ensure that the script itself is working correctly, and there are no typos or errors in the code. You can also test the script with a known working API key to verify its functionality.
+- Script Issues: Ensure that the script itself is working correctly, and there are no typos or errors in the code. You can also test the script with a known working API key to verify its functionality.
 
 If you've confirmed that your API key is correct and not expired, and you're still encountering issues, it's a good idea to contact OpenAI support for further assistance. They can help you troubleshoot and identify any specific issues with your account or API key.
 
