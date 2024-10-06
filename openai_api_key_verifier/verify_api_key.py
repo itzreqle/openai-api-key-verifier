@@ -2,7 +2,6 @@ import argparse
 import requests
 import re
 import logging
-import time
 from datetime import datetime, timedelta
 
 logging.basicConfig(
