@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='openai_api_key_verifier',
-    version='0.1.0',
+    version='0.1.1',
     author='Marcus Deacey',
     author_email='marcusdeacey@duck.com',  # Replace with your email
     description='A Python library to verify the validity of OpenAI API GPT-4 keys.',

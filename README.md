@@ -1,6 +1,6 @@
 # OpenAI API Key Verifier
 
-This Python library allows you to verify the validity of an OpenAI API key by making a test request to the OpenAI GPT-3 API and checking the response status. It is a useful tool to ensure that your API keys are working correctly.
+This Python library allows you to verify the validity of an OpenAI API key by making a test request to the OpenAI GPT-4 API and checking the response status. It is a useful tool to ensure that your API keys are working correctly.
 
 ## Prerequisites
 
@@ -10,10 +10,10 @@ Before you can use this library, make sure you have the following prerequisites 
 
 ## Installation
 
-You can install the OpenAI API Key Verifier library using pip:
+You can install the OpenAI API Key Verifier library using pip3:
 
 ```bash
-pip install openai_api_key_verifier
+pip3 install openai_api_key_verifier
 ```
 
 ## Usage
