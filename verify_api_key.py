@@ -12,32 +12,25 @@ logging.basicConfig(
 )
 
 def verify_api_key(api_key):
-    # Validate API key format
     if not bool(re.match(r'^sk-[a-zA-Z0-9\-_]+$', api_key)):
         logging.error("API key format is invalid.")
         return False
 
-    # Create a session to reuse the connection
     with requests.Session() as session:
         session.headers.update({
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json"
         })
 
-        # Verify the API key by making a simple completion request
         if not validate_api_key(session):
             return False
 
-        # Optionally, include information about available models
         list_models(session)
-
-        # Optionally, include account usage details
         get_account_usage(session)
 
     return True
 
 def validate_api_key(session):
-    """Function to validate the provided API key by making a sample request."""
     api_url = "https://api.openai.com/v1/chat/completions"
     payload = {
         "model": "gpt-4",
@@ -51,7 +44,6 @@ def validate_api_key(session):
         response = session.post(api_url, json=payload)
         response.raise_for_status()
 
-        # Log additional information about the API key from headers
         rate_limit = response.headers.get('x-ratelimit-limit-requests', 'Unknown')
         rate_remaining = response.headers.get('x-ratelimit-remaining-requests', 'Unknown')
         reset_time = response.headers.get('x-ratelimit-reset-requests', 'Unknown')
@@ -61,10 +53,9 @@ def validate_api_key(session):
         logging.info(f"Rate Limit Remaining: {rate_remaining}")
         logging.info(f"Rate Limit Reset Time (Raw): {reset_time}")
 
-        # Parse reset time and calculate future reset time
         if reset_time != 'Unknown':
             try:
-                reset_time_seconds = float(re.sub(r'[^\d.]', '', reset_time))  # Remove non-numeric characters except '.'
+                reset_time_seconds = float(re.sub(r'[^\d.]', '', reset_time))
                 reset_time_future = datetime.now() + timedelta(seconds=reset_time_seconds)
                 reset_time_human = reset_time_future.strftime('%Y-%m-%d %H:%M:%S')
                 logging.info(f"Rate Limit Reset Time (Local): {reset_time_human}")
@@ -77,7 +68,6 @@ def validate_api_key(session):
         return False
 
 def list_models(session):
-    """Optional function to list available models for the provided API key."""
     api_url = "https://api.openai.com/v1/models"
 
     try:
@@ -89,7 +79,6 @@ def list_models(session):
         logging.error(f"Error retrieving available models: {e}")
 
 def get_account_usage(session):
-    """Optional function to get account usage details for the provided API key."""
     api_url = "https://api.openai.com/dashboard/billing/usage"
 
     try:
