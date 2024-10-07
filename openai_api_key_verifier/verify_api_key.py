@@ -20,7 +20,7 @@ class OpenAIKeyVerificationError(Exception):
 def verify_api_key(api_key):
     logger.debug("Verifying API key format...")
     if not bool(re.match(r'^sk-[\w-]+$', api_key)):
-        logger.error("❌ API key is invalid.")
+        logger.error("API key is invalid.")
         return False
 
     logger.debug("API key format is valid.")
@@ -67,10 +67,10 @@ def validate_api_key(api_key):
     logger.debug("Validating API key...")
     try:
         make_api_request("https://api.openai.com/v1/models", api_key)
-        logger.info("✅ API key is valid.")
+        logger.info("API key is valid.")
         return True
     except OpenAIKeyVerificationError:
-        logger.error("❌ API key is invalid.")
+        logger.error("API key is invalid.")
         return False
 
 def check_model_access(api_key, model_name):
@@ -78,18 +78,18 @@ def check_model_access(api_key, model_name):
     try:
         model_url = f"https://api.openai.com/v1/models/{model_name}"
         make_api_request(model_url, api_key)
-        logger.info(f"✅ Access verified for model '{model_name}'.")
+        logger.info(f"Access verified for model '{model_name}'.")
         return True
     except OpenAIKeyVerificationError as e:
         error_message = str(e).lower()
         if "no such model" in error_message:
-            logger.error(f"❌ Model '{model_name}' does not exist.")
+            logger.error(f"Model '{model_name}' does not exist.")
         elif "insufficient_quota" in error_message:
-            logger.error(f"❌ Insufficient quota for model '{model_name}'.")
+            logger.error(f"Insufficient quota for model '{model_name}'.")
         elif "permission" in error_message or "not authorized" in error_message:
-            logger.error(f"❌ No permission to access model '{model_name}'.")
+            logger.error(f"No permission to access model '{model_name}'.")
         else:
-            logger.error(f"❌ Could not access model '{model_name}': {e}")
+            logger.error(f"Could not access model '{model_name}': {e}")
         return False
 
 def list_models(api_key):
@@ -104,7 +104,7 @@ def list_models(api_key):
             logger.info(f"• {model['id']}")
         return [model['id'] for model in models]
     except OpenAIKeyVerificationError as e:
-        logger.error(f"❌ Failed to list models: {e}")
+        logger.error(f"Failed to list models: {e}")
         return []
 
 def get_account_usage(api_key):
@@ -154,7 +154,7 @@ def get_account_usage(api_key):
                         logger.warning(f"Rate limit reached, retrying...")
                         time.sleep(5)  # Wait for 5 seconds before retrying
                     else:
-                        logger.error(f"❌ Failed to get usage data for {date_str}: {e}")
+                        logger.error(f"Failed to get usage data for {date_str}: {e}")
                         retry = False  # Other errors shouldn't be retried
 
             current_date += timedelta(days=1)
@@ -188,7 +188,7 @@ def get_account_usage(api_key):
             "╚════════════════════════════╝\n" )
 
     except OpenAIKeyVerificationError as e:
-        logger.error(f"❌ Failed to get usage data: {e}")
+        logger.error(f"Failed to get usage data: {e}")
         return None
 
 def main():
@@ -221,7 +221,7 @@ def main():
         logger.debug("Exiting due to KeyboardInterrupt.")
         exit(1)
     except Exception as e:
-        logger.error(f"❌ Unexpected error: {str(e)}")
+        logger.error(f"Unexpected error: {str(e)}")
         logger.debug("Exception details:", exc_info=True)
         exit(1)
     logger.debug("Verification process completed.")
