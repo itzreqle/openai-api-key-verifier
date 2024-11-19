@@ -1,80 +1,105 @@
 # OpenAI API Key Verifier
 
-This Python script allows you to verify the validity of an OpenAI API key by making a test request to the OpenAI GPT-3 API and checking the response status. It is a useful tool to ensure that your API keys are working correctly.
+This Python library allows you to verify the validity of an OpenAI API key by making a test request to the OpenAI API and checking the response status. It is a useful tool for both individual developers and platforms that use OpenAI's API to ensure API keys are working as expected before making actual API calls.
+
+## Why Use This Library?
+
+While you can verify an OpenAI API key by simply making an API call yourself, this library offers several benefits:
+
+- **Convenience**: It provides an easy, reusable way to verify keys with a single function call, handling potential errors and logging them properly.
+- **Model Access Verification**: Can determine if your key has access to specific models like GPT-4, which is a paid feature. This is particularly useful for open source tools that require GPT-4 access.
+- **Rate Limit Check**: It provides additional options to get information about rate limits, available models, and account usage.
+- **Integration for Open Source Tools**: If you're developing an open-source tool that allows users to provide their own OpenAI API key, this library makes it easier to validate those keys and verify model access without duplicating code.
+- **Security and Consistency**: This library adds a layer of consistent validation for any OpenAI API key by using regex format validation followed by an actual API call.
+- **Detailed Usage Analysis**: Provides comprehensive monthly token usage statistics with cost breakdowns for input and output tokens.
+
+## Security and Transparency
+
+- **Open Source**: The library is fully open source, and you can inspect the code yourself to ensure that it is secure. You can also compile it directly from the source if you prefer.
+- **Minimal Data Handling**: The library only sends your API key directly to OpenAI's official endpoints to verify validity. It does not store, log, or send API keys to any third party.
+- **No Data Farming**: The library is not intended to farm or steal API keys. It was created in response to the need for a reliable, easy way to validate keys and verify model access.
 
 ## Prerequisites
 
-Before you can use this program, make sure you have the following prerequisites installed:
-
-- Python 3: You can download it from [python.org](https://www.python.org/downloads/).
+- Python 3: You can download it from [python.org](https://python.org)
 
 ## Installation
 
-1. Clone or download this repository to your local machine.
+To install the OpenAI API Key Verifier library using pip, run:
 
 ```bash
-git clone https://github.com/itzreqle/openai-api-key-verifier.git
-```
-
-2. Navigate to the project directory.
-
-```bash
-cd openai-api-key-verifier
-```
-
-3. Install the required Python packages using pip.
-
-```bash
-pip install -r requirements.txt
+pip3 install openai_api_key_verifier
 ```
 
 ## Usage
 
-To verify an OpenAI API key, follow these steps:
+### Python Example
 
-1. Open a terminal or command prompt.
+```python
+from openai_api_key_verifier import verify_api_key, check_model_access, list_models, get_account_usage
 
-2. Navigate to the directory where you downloaded or cloned this repository.
+# Replace with your actual API key
+api_key = "your_actual_api_key_here"
 
-3. Run the script with the API key as an argument:
+# Verify if the API key is valid
+is_valid = verify_api_key(api_key)
 
-```bash
-python verify_api_key.py YOUR_API_KEY
+if is_valid:
+    print("API key is valid!")
+    
+    # Check for GPT-4 access
+    if check_model_access(api_key, "gpt-4"):
+        print("This key has GPT-4 access!")
+    
+    # List all available models
+    list_models(api_key)
+    
+    # Get usage statistics
+    get_account_usage(api_key)
+else:
+    print("API key is invalid.")
 ```
 
-Replace `YOUR_API_KEY` with the actual OpenAI API key you want to check.
+### Command Line Usage
 
-4. The script will send a test request to the OpenAI GPT-3 API and check if the API key is valid. It will then display a message indicating whether the key is valid or invalid.
-
-## Example
-
-Here's an example of how to use the script:
+You can verify an API key directly from the command line with various options:
 
 ```bash
-python verify_api_key.py your_actual_api_key_here
+# Basic verification
+python3 verify_openai_api_key YOUR_API_KEY
+
+# Check model access
+python3 verify_openai_api_key YOUR_API_KEY --check-model gpt-4
+
+# List available models
+python3 verify_openai_api_key YOUR_API_KEY --list-models
+
+# Show usage statistics
+python3 verify_openai_api_key YOUR_API_KEY --show-usage
+
+# Enable debug logging
+python3 verify_openai_api_key YOUR_API_KEY --debug
 ```
-If the program consistently reports that the API key is invalid, there could be several reasons for this:
 
-- Incorrect API Key: Make sure you are providing the correct OpenAI API key. The API key should be a long string of letters and numbers, and it should be copied and pasted accurately into the command line.
+## Available Functions
 
-- Expired or Revoked Key: If the API key has expired or has been revoked by OpenAI, it will be considered invalid. Check the status of your API key in your OpenAI account dashboard.
+- `verify_api_key(api_key)`: Checks the validity of the API key by making a minimal request to the OpenAI API.
+- `check_model_access(api_key, model_name)`: Verifies if the key has access to a specific model.
+- `list_models(api_key)`: Lists available models for the given API key.
+- `get_account_usage(api_key)`: Retrieves detailed account usage statistics, including token counts and costs.
 
-- Network Issues: Ensure that your computer has a working internet connection. The script needs to make a network request to OpenAI's servers to validate the API key.
+## Key Features
 
-- Firewall or Proxy Issues: If you're behind a corporate firewall or using a proxy server, it may be blocking the script's requests. Make sure that the necessary network configurations are in place.
-
-- Rate Limits: OpenAI imposes rate limits on API requests. If you have exceeded the rate limits, it may temporarily block your requests, leading to an "invalid" response. Check OpenAI's documentation for rate limit details and ensure you're not exceeding them.
-
-- OpenAI Service Status: Sometimes, OpenAI services can experience downtime or issues. Check OpenAI's status page or their official communication channels for any service disruptions.
-
-- Script Issues: Ensure that the script itself is working correctly, and there are no typos or errors in the code. You can also test the script with a known working API key to verify its functionality.
-
-If you've confirmed that your API key is correct and not expired, and you're still encountering issues, it's a good idea to contact OpenAI support for further assistance. They can help you troubleshoot and identify any specific issues with your account or API key.
+- **Enhanced Error Handling**: Better handling of rate limits and API errors with automatic retries.
+- **Detailed Usage Statistics**: Monthly token usage breakdown with separate tracking for input and output tokens.
+- **Cost Analysis**: Calculation of costs based on current OpenAI pricing for both input and output tokens.
+- **Debug Mode**: Additional logging options for troubleshooting with the `--debug` flag.
+- **Improved Console Output**: Better formatted console output with clear visual indicators for success and failure.
 
 ## Contributing
 
-If you'd like to contribute to this project, please fork the repository and create a pull request with your changes.
+If you'd like to contribute to this project, please fork the repository and create a pull request with your changes. We welcome feedback and improvements from the community to make this tool more useful.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the LICENSE file for details.
