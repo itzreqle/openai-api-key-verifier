@@ -1,45 +1,105 @@
 import argparse
 import requests
+import re
+import logging
+import time
+from datetime import datetime, timedelta
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[logging.StreamHandler()]
+)
 
 def verify_api_key(api_key):
-    # Define the API endpoint URL
-    api_url = "https://api.openai.com/v1/engines/davinci/completions"
-
-    # Set up the headers with the API key
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json"
-    }
-
-    # Create a test request to check the API key
-    try:
-        response = requests.post(api_url, headers=headers)
-        response.raise_for_status()  # Raise an exception if the request fails
-
-        # If the request is successful, the API key is valid
-        return True
-    except requests.exceptions.RequestException:
-        # If the request fails, the API key is invalid
+    if not bool(re.match(r'^sk-[a-zA-Z0-9\-_]+$', api_key)):
+        logging.error("API key format is invalid.")
         return False
 
+    with requests.Session() as session:
+        session.headers.update({
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json"
+        })
+
+        if not validate_api_key(session):
+            return False
+
+        list_models(session)
+        get_account_usage(session)
+
+    return True
+
+def validate_api_key(session):
+    api_url = "https://api.openai.com/v1/chat/completions"
+    payload = {
+        "model": "gpt-4",
+        "messages": [
+            {"role": "user", "content": "This is a test message to validate the API key."}
+        ],
+        "max_tokens": 1
+    }
+
+    try:
+        response = session.post(api_url, json=payload)
+        response.raise_for_status()
+
+        rate_limit = response.headers.get('x-ratelimit-limit-requests', 'Unknown')
+        rate_remaining = response.headers.get('x-ratelimit-remaining-requests', 'Unknown')
+        reset_time = response.headers.get('x-ratelimit-reset-requests', 'Unknown')
+
+        logging.info("API key validation successful.")
+        logging.info(f"Rate Limit: {rate_limit}")
+        logging.info(f"Rate Limit Remaining: {rate_remaining}")
+        logging.info(f"Rate Limit Reset Time (Raw): {reset_time}")
+
+        if reset_time != 'Unknown':
+            try:
+                reset_time_seconds = float(re.sub(r'[^\d.]', '', reset_time))
+                reset_time_future = datetime.now() + timedelta(seconds=reset_time_seconds)
+                reset_time_human = reset_time_future.strftime('%Y-%m-%d %H:%M:%S')
+                logging.info(f"Rate Limit Reset Time (Local): {reset_time_human}")
+            except ValueError:
+                logging.error(f"Could not parse rate limit reset time: {reset_time}")
+
+        return True
+    except requests.exceptions.RequestException as e:
+        logging.error(f"Error during API key validation: {e}")
+        return False
+
+def list_models(session):
+    api_url = "https://api.openai.com/v1/models"
+
+    try:
+        response = session.get(api_url)
+        response.raise_for_status()
+        models = response.json().get("data", [])
+        logging.info(f"Available Models for API key: {[model['id'] for model in models]}")
+    except requests.exceptions.RequestException as e:
+        logging.error(f"Error retrieving available models: {e}")
+
+def get_account_usage(session):
+    api_url = "https://api.openai.com/dashboard/billing/usage"
+
+    try:
+        response = session.get(api_url)
+        response.raise_for_status()
+        usage = response.json()
+        logging.info(f"Account Usage Details: {usage}")
+    except requests.exceptions.HTTPError as e:
+        if response.status_code == 403:
+            logging.warning("Access to billing/usage information is restricted for this API key.")
+        else:
+            logging.error(f"HTTP error occurred while retrieving account usage details: {e}")
+    except requests.exceptions.RequestException as e:
+        logging.error(f"Error retrieving account usage details: {e}")
+
 def main():
-    # Create a command-line argument parser
     parser = argparse.ArgumentParser(description="Verify OpenAI API keys")
-    
-    # Add an argument for the API key
     parser.add_argument("api_key", type=str, help="The API key to verify")
-    
-    # Parse the command-line arguments
     args = parser.parse_args()
 
-    # Get the API key from the parsed arguments
-    api_key = args.api_key
-
-    # Verify the API key
-    if verify_api_key(api_key):
-        print("API key is valid.")
-    else:
-        print("API key is invalid.")
+    verify_api_key(args.api_key)
 
 if __name__ == "__main__":
     main()
